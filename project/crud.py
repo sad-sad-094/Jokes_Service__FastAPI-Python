@@ -23,3 +23,19 @@ def get_user_by_email(db: Session, email: str):
 
 def get_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.User).offset(skip).limit(limit).all()
+
+def create_joke(db: Session, joke: schemas.JokeCreate):
+    db_joke = models.Joke(
+        source = joke.source,
+        text = joke.text,
+        id = joke.id,
+        owner_id = joke.owner_id,
+    )    
+    db.add(db_joke)
+    db.commit()
+    db.refresh(db_joke)
+
+    return db_joke
+
+def get_jokes(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Joke).offset(skip).limit(limit).all()

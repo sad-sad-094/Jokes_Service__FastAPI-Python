@@ -11,6 +11,17 @@ class Joke(BaseModel):
     class Config:
         orm_mode = True
 
+class JokeCreate(BaseModel):
+    source: str
+    text: str
+    id: int
+    owner_id: int
+
+class JokesRequest(BaseModel):
+    source: str
+    text: str
+    id: int
+
 
 # class Jokes(Joke):
 #     jokes = list[Joke] = []

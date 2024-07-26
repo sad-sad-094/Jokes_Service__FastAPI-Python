@@ -19,13 +19,13 @@ class User(Base):
     # items = relationship("Item", back_populates="owner")
 
 
-# class Joke(Base):
-#     __tablename__ = "joke"
+class Joke(Base):
+    __tablename__ = "joke"
 
-#     source = Column(String)
-#     text = Column(String)
-#     id = Column(Integer, unique=True, primary_key=True)
-#     title = Column(String, index=True)
-#     owner_id = Column(Integer, ForeignKey("users.id"))
+    source = Column(String)
+    text = Column(String)
+    id = Column(Integer, unique=True, primary_key=True)
+    owner_id = Column(Integer)
+    # owner_id = Column(Integer, ForeignKey("users.id"))
 
-#     owner = relationship("User", back_populates="items")
+    # owner = relationship("User", back_populates="items")
