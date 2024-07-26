@@ -35,6 +35,11 @@ class UserCreate(BaseModel):
     display_name: str
     id: int
 
+class UsersRequest(BaseModel):
+    email: str
+    display_name: str
+    id: int
+
 class UserRequestModel(BaseModel):
   id: int
   username: str
