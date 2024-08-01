@@ -1,43 +1,38 @@
 import requests
 import random
 
-headers = {"Accept": "application/json"}
-url_chuck = "https://api.chucknorris.io/jokes/random"
-url_dad = "https://icanhazdadjoke.com"
+from project import schemas
 
-response_chuck = requests.get(url_chuck)
-response_dad = requests.get(url_dad, headers=headers)
+URL_CHUCK = "https://api.chucknorris.io/jokes/random"
+URL_DAD = "https://icanhazdadjoke.com"
 
-request_options = ["chucknorris", "dadjoke"]
-
-selected_joke = random.choice(request_options)
-
-if selected_joke == "chucknorris":
-    if response_chuck.status_code == 200:
-        print(f"Your selected joke is: {selected_joke}. Here it goes:")
-        parsed_response = response_chuck.json()
-        print(f"{parsed_response["value"]}.")
-    elif response_chuck.status_code == 404:
-        print("Chuck Not Found. Try again later.")
-elif selected_joke == "dadjoke":
-    if response_dad.status_code == 200:
-        print(f"Your selected joke is: {selected_joke}. Here it goes:")
-        parsed_response = response_dad.json()
-        print(f"{parsed_response["joke"]}.")
-    elif response_dad.status_code == 404:
-        print("Dad Not Found. Try again later.")
+REQUEST_OPTIONS = ["chucknorris", "dadjoke"]
 
 
-    #     elif selected_joke == "dadjoke":
-    # parsed_response = response_dad.text
-    # print(parsed_response)
-    # if response_dad.status_code == 200:
-    #     evaluated_response = parsed_response["status"]
-    #     if evaluated_response == 404:
-    #         print(f"Something went wrong. Please check out your request. {response_dad.message}.")
-    #     else:
-    #         print(f"Your selected joke is: {selected_joke}. Here it goes:")
-    #         parsed_response = response_dad.json()
-    #         print(f"{parsed_response["joke"]}.")
-    # elif response_dad.status_code == 404:
-    #     print("Dad Not Found. Try again later.")
+def request_chuck(user_id: int) -> schemas.JokeCreate | None:
+    response = requests.get(URL_CHUCK)
+    if response.status_code != 200:
+        return None
+    parsed_response = response.json()
+    joke = schemas.JokeCreate(source="Chuck Norris", text=parsed_response["value"], id=parsed_response["id"], owner_id=user_id)
+    return joke
+
+
+def request_dad(user_id: int) -> schemas.JokeCreate | None:
+    response = requests.get(URL_DAD, headers={"Accept": "application/json"})
+    if response.status_code != 200:
+        return None
+    parsed_response = response.json()
+    if parsed_response["status"] != 200:
+        return None
+    joke = schemas.JokeCreate(source="Dad Joke", text=parsed_response["joke"], id=parsed_response["id"], owner_id=user_id)
+    return joke
+    
+
+def get_random_joke(user_id: int) -> schemas.JokeCreate | None:
+    selected_joke = random.choice(REQUEST_OPTIONS)
+    if selected_joke == "chucknorris":
+        final_joke = request_chuck(user_id)
+    else:
+        final_joke = request_dad(user_id)
+    return final_joke

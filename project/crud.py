@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
 from project import models, schemas
 
@@ -23,7 +24,7 @@ def get_user_by_email(db: Session, email: str):
 def get_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.User).offset(skip).limit(limit).all()
 
-def create_joke(db: Session, joke: schemas.JokeCreate):
+def create_joke(db: Session, joke: schemas.JokeCreate) -> models.Joke | None:
     db_joke = models.Joke(
         source = joke.source,
         text = joke.text,
@@ -31,10 +32,13 @@ def create_joke(db: Session, joke: schemas.JokeCreate):
         owner_id = joke.owner_id,
     )    
     db.add(db_joke)
-    db.commit()
-    db.refresh(db_joke)
-
-    return db_joke
+    try: 
+        db.commit()
+        db.refresh(db_joke)
+        return db_joke
+    except IntegrityError:
+        db.rollback()
+        return None
 
 def get_jokes(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Joke).offset(skip).limit(limit).all()

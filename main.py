@@ -6,6 +6,7 @@ from jwt.exceptions import InvalidTokenError
 from sqlalchemy.orm import Session
 from typing import Annotated
 
+from project.client import get_random_joke
 from project.database import base as Base, engine, SessionLocal
 from project import schemas, crud, utils
 
@@ -13,7 +14,7 @@ Base.metadata.create_all(engine)
 
 app = FastAPI()
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login")
 
 # Dependency
 def get_db():
@@ -24,7 +25,7 @@ def get_db():
         db.close()
 
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
+async def get_current_user_id(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -32,24 +33,12 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Se
 
     try:
         payload = jwt.decode(token, utils.SECRET_KEY, algorithms=[utils.ALGORITHM])
-        username: str = payload.get("user_id")
-        if username is None:
+        user_id: int = payload.get("user_id")
+        if user_id is None:
             raise credentials_exception
-        token_data = schemas.TokenData(user_id=username)
     except InvalidTokenError:
         raise credentials_exception
-    user = crud.get_user_by_email(db, token_data.username)
-    if user is None:
-        raise credentials_exception
-    return user
-
-
-async def get_current_active_user(
-    current_user: Annotated[schemas.UsersRequest, Depends(get_current_user)],
-):
-    if current_user.disabled:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user")
-    return current_user
+    return user_id
 
 
 @app.post("/users/register", summary="Create a new user", response_model=schemas.User)
@@ -80,17 +69,23 @@ async def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_
     return users
 
 
-@app.get("/users/me/", response_model=schemas.User)
-async def read_users_me(
-    current_user: Annotated[schemas.User, Depends(get_current_active_user)],
-):
-    return current_user
+# @app.get("/users/me/", response_model=schemas.User)
+# async def read_users_me(
+#     current_user: Annotated[schemas.User, Depends(get_current_active_user)],
+# ):
+#     return current_user
 
 
 @app.post("/jokes/new",summary="Get a new joke" , response_model=schemas.Joke)
-async def create_joke(joke: schemas.JokeCreate, db: Session = Depends(get_db)):
-    return crud.create_joke(db=db, joke=joke)
-
+async def create_joke(joke: schemas.JokeCreate, user_id: Annotated[int, Depends(get_current_user_id)], db: Session = Depends(get_db)):
+    new_joke = get_random_joke(user_id)
+    if not new_joke:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    joke_db = crud.create_joke(db=db, joke=new_joke)
+    if not joke_db:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    return joke_db
+    
 
 @app.get("/jokes",summary="Get all jokes from an registered user", response_model=list[schemas.JokesRequest])
 async def read_jokes(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):

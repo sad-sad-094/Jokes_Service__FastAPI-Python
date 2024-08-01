@@ -5,7 +5,7 @@ from pydantic import field_validator
 class Joke(BaseModel):
     source: str
     text: str
-    id: int
+    id: str
     owner_id: int
 
     class Config:
@@ -14,13 +14,13 @@ class Joke(BaseModel):
 class JokeCreate(BaseModel):
     source: str
     text: str
-    id: int
+    id: str
     owner_id: int
 
 class JokesRequest(BaseModel):
     source: str
     text: str
-    id: int
+    id: str
 
 
 # class Jokes(Joke):
@@ -58,4 +58,4 @@ class Token(BaseModel):
     token_type: str
 
 class TokenData(BaseModel):
-    user_id: str | None = None
+    user_id: int | None = None

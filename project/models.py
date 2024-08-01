@@ -23,8 +23,6 @@ class Joke(Base):
 
     source = Column(String)
     text = Column(String)
-    id = Column(Integer, unique=True, primary_key=True)
-    owner_id = Column(Integer)
-    # owner_id = Column(Integer, ForeignKey("users.id"))
-
-    # owner = relationship("User", back_populates="items")
+    id = Column(String, primary_key=True)
+    # owner_id = Column(Integer)
+    owner_id = Column(Integer, ForeignKey("users.id"))
