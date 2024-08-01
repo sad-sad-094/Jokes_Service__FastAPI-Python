@@ -1,6 +1,8 @@
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.responses import RedirectResponse
+import jwt
+from jwt.exceptions import InvalidTokenError
 from sqlalchemy.orm import Session
 from typing import Annotated
 
@@ -20,6 +22,34 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+    )
+
+    try:
+        payload = jwt.decode(token, utils.SECRET_KEY, algorithms=[utils.ALGORITHM])
+        username: str = payload.get("user_id")
+        if username is None:
+            raise credentials_exception
+        token_data = schemas.TokenData(user_id=username)
+    except InvalidTokenError:
+        raise credentials_exception
+    user = crud.get_user_by_email(db, token_data.username)
+    if user is None:
+        raise credentials_exception
+    return user
+
+
+async def get_current_active_user(
+    current_user: Annotated[schemas.UsersRequest, Depends(get_current_user)],
+):
+    if current_user.disabled:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user")
+    return current_user
 
 
 @app.post("/users/register", summary="Create a new user", response_model=schemas.User)
@@ -48,6 +78,13 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: 
 async def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     users = crud.get_users(db, skip=skip, limit=limit)
     return users
+
+
+@app.get("/users/me/", response_model=schemas.User)
+async def read_users_me(
+    current_user: Annotated[schemas.User, Depends(get_current_active_user)],
+):
+    return current_user
 
 
 @app.post("/jokes/new",summary="Get a new joke" , response_model=schemas.Joke)
