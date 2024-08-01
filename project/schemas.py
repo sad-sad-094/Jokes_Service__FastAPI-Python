@@ -29,8 +29,7 @@ class JokesRequest(BaseModel):
 
 class User(BaseModel):
     email: str
-    password: str
-    password_confirm: str
+    hashed_password: str
     display_name: str
     id: int
     # jokes: list[Joke] = []
@@ -51,6 +50,9 @@ class UsersRequest(BaseModel):
     display_name: str
     id: int
 
-class UserRequestModel(BaseModel):
-  id: int
-  username: str
+class UserInDB(User):
+    hashed_password: str
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str

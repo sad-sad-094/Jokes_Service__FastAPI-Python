@@ -12,7 +12,6 @@ class User(Base):
     display_name = Column(String)
     email = Column(String, unique=True)
     hashed_password = Column(String)
-    hashed_password_confirm = Column(String)
     id = Column(Integer, unique=True, primary_key=True)
     # is_active = Column(Boolean, default=True)
 
