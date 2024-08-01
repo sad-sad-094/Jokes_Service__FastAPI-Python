@@ -22,7 +22,7 @@ def get_db():
         db.close()
 
 
-@app.post("/users", summary="Create a new user", response_model=schemas.User)
+@app.post("/users/register", summary="Create a new user", response_model=schemas.User)
 async def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = crud.get_user_by_email(db, email=user.email)
     if db_user:
@@ -33,13 +33,13 @@ async def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return crud.create_user(db=db, user=user)
 
 
-@app.post("/token", response_model=schemas.Token)
+@app.post("/users/login", summary="Login a user", response_model=schemas.Token)
 async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_db)):
     user_db = crud.get_user_by_email(db, form_data.username)
     if not user_db:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Email has been not registered")
     if not utils.verify_password(form_data.password, user_db.hashed_password):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect password")
     access_token = utils.create_access_token({"user_id": user_db.id})
     return schemas.Token(access_token=access_token, token_type="bearer")
 
@@ -50,7 +50,7 @@ async def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_
     return users
 
 
-@app.post("/jokes",summary="Create a new joke" , response_model=schemas.Joke)
+@app.post("/jokes/new",summary="Get a new joke" , response_model=schemas.Joke)
 async def create_joke(joke: schemas.JokeCreate, db: Session = Depends(get_db)):
     return crud.create_joke(db=db, joke=joke)
 
