@@ -1,6 +1,5 @@
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from fastapi.responses import RedirectResponse
 import jwt
 from jwt.exceptions import InvalidTokenError
 from sqlalchemy.orm import Session
@@ -64,16 +63,9 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: 
 
 
 @app.get("/users", summary="Get all registered users", response_model=list[schemas.UsersRequest])
-async def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+async def read_users(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     users = crud.get_users(db, skip=skip, limit=limit)
     return users
-
-
-# @app.get("/users/me/", response_model=schemas.User)
-# async def read_users_me(
-#     current_user: Annotated[schemas.User, Depends(get_current_active_user)],
-# ):
-#     return current_user
 
 
 @app.post("/jokes/new",summary="Get a new joke" , response_model=schemas.Joke)
@@ -88,6 +80,6 @@ async def create_joke(joke: schemas.JokeCreate, user_id: Annotated[int, Depends(
     
 
 @app.get("/jokes",summary="Get all jokes from an registered user", response_model=list[schemas.JokesRequest])
-async def read_jokes(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    jokes = crud.get_jokes(db, skip=skip, limit=limit)
+async def read_user_jokes(user_id: Annotated[int, Depends(get_current_user_id)], skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+    jokes = crud.get_jokes(db, user_id)
     return jokes

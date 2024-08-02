@@ -1,6 +1,4 @@
 from pydantic import BaseModel
-from pydantic import field_validator
-
 
 class Joke(BaseModel):
     source: str
@@ -23,17 +21,11 @@ class JokesRequest(BaseModel):
     id: str
 
 
-# class Jokes(Joke):
-#     jokes = list[Joke] = []
-
-
 class User(BaseModel):
     email: str
     hashed_password: str
     display_name: str
     id: int
-    # jokes: list[Joke] = []
-    # is_active: bool
 
     class Config:
         orm_mode = True

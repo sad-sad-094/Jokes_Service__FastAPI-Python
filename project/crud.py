@@ -6,7 +6,7 @@ from project import models, schemas
 def get_user(db: Session, user_id: int):
     return db.query(models.User).filter(models.User.id == user_id).first()
 
-def create_user(db: Session, user: schemas.UserCreate):
+def create_user(db: Session, user: schemas.UserCreate) -> models.User:
     db_user = models.User(
         email=user.email, 
         display_name=user.display_name,
@@ -18,10 +18,10 @@ def create_user(db: Session, user: schemas.UserCreate):
 
     return db_user
 
-def get_user_by_email(db: Session, email: str):
+def get_user_by_email(db: Session, email: str) -> models.User:
     return db.query(models.User).where(models.User.email == email).first()
 
-def get_users(db: Session, skip: int = 0, limit: int = 100):
+def get_users(db: Session, skip: int = 0, limit: int = 10) -> models.User:
     return db.query(models.User).offset(skip).limit(limit).all()
 
 def create_joke(db: Session, joke: schemas.JokeCreate) -> models.Joke | None:
@@ -40,5 +40,6 @@ def create_joke(db: Session, joke: schemas.JokeCreate) -> models.Joke | None:
         db.rollback()
         return None
 
-def get_jokes(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Joke).offset(skip).limit(limit).all()
+def get_jokes(db: Session, user_id: int, skip: int = 0, limit: int = 10) -> models.Joke:
+    print(user_id)
+    return db.query(models.Joke).where(models.Joke.owner_id == user_id).offset(skip).limit(limit).all()
