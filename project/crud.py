@@ -3,7 +3,7 @@ from sqlalchemy.exc import IntegrityError
 
 from project import models, schemas
 
-def get_user(db: Session, user_id: int):
+def get_user(db: Session, user_id: int)  -> models.User:
     return db.query(models.User).filter(models.User.id == user_id).first()
 
 def create_user(db: Session, user: schemas.UserCreate) -> models.User:
