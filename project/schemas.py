@@ -4,7 +4,7 @@ class Joke(BaseModel):
     source: str
     text: str
     id: str
-    owner_id: int
+    # owner_id: int
 
     class Config:
         orm_mode = True
@@ -25,7 +25,6 @@ class User(BaseModel):
     email: str
     hashed_password: str
     display_name: str
-    id: int
 
     class Config:
         orm_mode = True
@@ -35,7 +34,6 @@ class UserCreate(BaseModel):
     password: str
     password_confirm: str
     display_name: str
-    id: int
 
 class UsersRequest(BaseModel):
     email: str

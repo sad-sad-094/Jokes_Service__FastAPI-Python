@@ -9,7 +9,6 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 5
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 def get_hashed_password(password: str) -> str:
     return password_context.hash(password)
