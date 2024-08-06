@@ -1,7 +1,7 @@
-from fastapi.security import OAuth2PasswordBearer
-from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
+
 import jwt
+from passlib.context import CryptContext
 
 SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
 ALGORITHM = "HS256"
@@ -20,6 +20,7 @@ def verify_password(password: str, hashed_pass: str) -> bool:
 
 def create_access_token(data: dict, expires_delta: int = None) -> str:
     to_encode = data.copy()
+    
     if expires_delta:
         expires_delta = datetime.now(timezone.utc) + expires_delta
     else:

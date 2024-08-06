@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
-from project import models, schemas
+from app import models, schemas
 
 def get_user(db: Session, user_id: int)  -> models.User:
     return db.query(models.User).filter(models.User.id == user_id).first()
@@ -40,6 +40,10 @@ def create_joke(db: Session, joke: schemas.JokeCreate) -> models.Joke | None:
         db.rollback()
         return None
 
-def get_jokes(db: Session, user_id: int, skip: int = 0, limit: int = 10) -> models.Joke:
-    print(user_id)
+def get_jokes(
+    db: Session,
+    user_id: int,
+    skip: int = 0,
+    limit: int = 10
+) -> models.Joke:
     return db.query(models.Joke).where(models.Joke.owner_id == user_id).offset(skip).limit(limit).all()

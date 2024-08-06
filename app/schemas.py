@@ -4,7 +4,6 @@ class Joke(BaseModel):
     source: str
     text: str
     id: str
-    # owner_id: int
 
     class Config:
         orm_mode = True
@@ -49,3 +48,4 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     user_id: int | None = None
+    

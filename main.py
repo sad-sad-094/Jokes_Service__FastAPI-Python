@@ -1,13 +1,14 @@
-from fastapi import Depends, FastAPI, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-import jwt
-from jwt.exceptions import InvalidTokenError
-from sqlalchemy.orm import Session
 from typing import Annotated
 
-from project.client import get_random_joke
-from project.database import base as Base, engine, SessionLocal
-from project import schemas, crud, utils
+import jwt
+from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from jwt.exceptions import InvalidTokenError
+from sqlalchemy.orm import Session
+
+from app import schemas, crud, utils
+from app.client import get_random_joke
+from app.database import base as Base, engine, SessionLocal
 
 Base.metadata.create_all(engine)
 
@@ -63,7 +64,10 @@ async def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
         )
     
     if user.password != user.password_confirm:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect password")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Incorrect password"
+        )
     
     user.password = utils.get_hashed_password(user.password)
     return crud.create_user(db=db, user=user)
@@ -77,7 +81,8 @@ async def login(
     user_db = crud.get_user_by_email(db, form_data.username)
     
     if not user_db:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Email has been not registered"
         )
     
@@ -100,12 +105,13 @@ async def read_users(skip: int = 0, limit: int = 10, db: Session = Depends(get_d
     return users
 
 
-@app.post("/jokes/new",
+@app.post(
+    "/jokes/new",
     summary="Get a new joke" ,
     status_code=status.HTTP_201_CREATED,
     response_model=schemas.Joke
 )
-async def create_joke(joke: schemas.JokeCreate,
+async def create_joke(
     user_id: Annotated[int, Depends(get_current_user_id)],
     db: Session = Depends(get_db)
 ):
