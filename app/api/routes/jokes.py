@@ -10,10 +10,8 @@ from app.utils import utils
 from app.infra.postgres.crud import jokes_crud
 from app.schemas import jokes
 from app.infra.requests.client import get_random_joke
-from app.infra.postgres.database import base as Base, engine, get_db
+from app.infra.postgres.database import get_db
 
-
-Base.metadata.create_all(engine)
 
 router = APIRouter()
 

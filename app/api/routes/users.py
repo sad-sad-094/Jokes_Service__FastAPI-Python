@@ -7,9 +7,8 @@ from sqlalchemy.orm import Session
 from app.utils import utils
 from app.infra.postgres.crud import users_crud
 from app.schemas import users
-from app.infra.postgres.database import base as Base, engine, get_db
+from app.infra.postgres.database import get_db
 
-Base.metadata.create_all(engine)
 
 router = APIRouter()
 

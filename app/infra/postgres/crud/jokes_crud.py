@@ -1,12 +1,12 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
-from app.infra.postgres import models
+from app.infra.postgres.models.joke import Joke
 from app.schemas import jokes
 
 
-def create_joke(db: Session, joke: jokes.JokeCreate) -> models.Joke | None:
-    db_joke = models.Joke(
+def create_joke(db: Session, joke: jokes.JokeCreate) -> Joke | None:
+    db_joke = Joke(
         source = joke.source,
         text = joke.text,
         id = joke.id,
@@ -28,5 +28,5 @@ def get_jokes(
     user_id: int,
     skip: int = 0,
     limit: int = 10
-) -> models.Joke:
-    return db.query(models.Joke).where(models.Joke.owner_id == user_id).offset(skip).limit(limit).all()
+) -> Joke:
+    return db.query(Joke).where(Joke.owner_id == user_id).offset(skip).limit(limit).all()
