@@ -2,15 +2,15 @@ from typing import Annotated
 
 import jwt
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from sqlalchemy.orm import Session
 
 from app.utils import utils
-from app.infra.postgres.crud import jokes_crud, users_crud
-from app.schemas import users, jokes
+from app.infra.postgres.crud import jokes_crud
+from app.schemas import jokes
 from app.infra.requests.client import get_random_joke
-from app.infra.postgres.database import base as Base, engine, SessionLocal, get_db
+from app.infra.postgres.database import base as Base, engine, get_db
 
 
 Base.metadata.create_all(engine)
@@ -44,7 +44,7 @@ async def get_current_user_id(
 
 
 @router.post(
-    "/jokes/new",
+    "/new",
     summary="Get a new joke" ,
     status_code=status.HTTP_201_CREATED,
     response_model=jokes.Joke
@@ -65,7 +65,7 @@ async def create_joke(
     
 
 @router.get(
-    "/jokes",
+    "",
     summary="Get all jokes from an registered user",
     response_model=list[jokes.JokesRequest]
 )

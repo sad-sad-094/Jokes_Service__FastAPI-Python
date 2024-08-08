@@ -3,9 +3,7 @@ from datetime import datetime, timedelta, timezone
 import jwt
 from passlib.context import CryptContext
 
-SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 5
+from config import settings
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -24,8 +22,8 @@ def create_access_token(data: dict, expires_delta: int = None) -> str:
     if expires_delta:
         expires_delta = datetime.now(timezone.utc) + expires_delta
     else:
-        expires_delta = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        expires_delta = datetime.now(timezone.utc) + timedelta(minutes=settings.jwt_token_expo)
     
     to_encode.update({"exp": expires_delta})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, settings.jwt_secret, settings.jwt_algorithm)
     return encoded_jwt        

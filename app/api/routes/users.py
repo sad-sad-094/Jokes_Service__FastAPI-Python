@@ -1,15 +1,13 @@
 from typing import Annotated
 
-import jwt
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from jwt.exceptions import InvalidTokenError
 from sqlalchemy.orm import Session
 
 from app.utils import utils
-from app.infra.postgres.crud import jokes_crud, users_crud
-from app.schemas import users, jokes
-from app.infra.postgres.database import base as Base, engine, SessionLocal, get_db
+from app.infra.postgres.crud import users_crud
+from app.schemas import users
+from app.infra.postgres.database import base as Base, engine, get_db
 
 Base.metadata.create_all(engine)
 
@@ -19,7 +17,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login")
 
 
 @router.post(
-    "/users/register",
+    "/register",
     summary="Create a new user",
     status_code=status.HTTP_201_CREATED,
     response_model=users.User
@@ -43,7 +41,7 @@ async def create_user(user: users.UserCreate, db: Session = Depends(get_db)):
     return users_crud.create_user(db=db, user=user)
 
 
-@router.post("/users/login", summary="Login a user", response_model=users.Token)
+@router.post("/login", summary="Login a user", response_model=users.Token)
 async def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: Session = Depends(get_db)
@@ -66,7 +64,7 @@ async def login(
 
 
 @router.get(
-        "/users",
+        "",
         summary="Get all registered users",
         response_model=list[users.UsersRequest]
     )
