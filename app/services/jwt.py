@@ -4,7 +4,7 @@ import jwt
 
 from app.config import settings
 
-class jwt_service: 
+class JWTService:
     def create_access_token(self, data: dict, expires_delta: int = None) -> str:
         to_encode = data.copy()
         
@@ -16,3 +16,5 @@ class jwt_service:
         to_encode.update({"exp": expires_delta})
         encoded_jwt = jwt.encode(to_encode, settings.jwt_secret, settings.jwt_algorithm)
         return encoded_jwt
+    
+jwt_service = JWTService()

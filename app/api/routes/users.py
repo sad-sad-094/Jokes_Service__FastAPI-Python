@@ -5,8 +5,8 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
-from app.services.auth import auth_service
-from app.services.jwt import jwt_service
+from app.services import auth_service
+from app.services import jwt_service
 from app.infra.postgres.crud import users_crud
 from app.schemas import users
 from app.infra.postgres.database import get_db

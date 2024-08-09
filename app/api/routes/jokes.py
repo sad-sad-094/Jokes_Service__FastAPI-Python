@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from app.schemas import jokes
-from app.services.random_jokes import get_random_joke
+from app.services import joke_services
 from app.infra.postgres.crud import jokes_crud
 from app.infra.postgres.database import get_db
 from app.api.routes.auth import get_current_user_id
@@ -28,7 +28,7 @@ async def create_joke(
     user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
 ):
-    new_joke = get_random_joke(user_id)
+    new_joke = joke_services.get_random_joke(user_id)
 
     if not new_joke:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
