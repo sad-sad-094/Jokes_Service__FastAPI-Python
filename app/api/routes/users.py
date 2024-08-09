@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
-from app.services.auth import get_hashed_password, create_access_token, verify_password
+from app.services.auth import create_access_token, user_auth
 from app.infra.postgres.crud import users_crud
 from app.schemas import users
 from app.infra.postgres.database import get_db
@@ -40,7 +40,7 @@ async def create_user(user: users.UserCreate, db: Session = Depends(get_db)):
             detail="Incorrect password"
         )
     
-    user.password = get_hashed_password(user.password)
+    user.password = user_auth.get_hashed_password(user.password)
     return users_crud.create_user(db=db, user=user)
 
 
@@ -65,7 +65,7 @@ async def login(
             detail="Email has been not registered"
         )
     
-    if not verify_password(form_data.password, user_db.hashed_password):
+    if not user_auth.verify_password(form_data.password, user_db.hashed_password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect password"
         )

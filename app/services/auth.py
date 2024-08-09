@@ -9,12 +9,21 @@ cripto_schema = "bcrypt"
 password_context = CryptContext(schemes=[cripto_schema], deprecated="auto")
 
 
-def get_hashed_password(password: str) -> str:
-    return password_context.hash(password)
+class Authentication:
+    def __init__(self):
+        self.cripto_schema = "bcrypt"
+        self.password_context = CryptContext(schemes=[self.cripto_schema], deprecated="auto")
 
 
-def verify_password(password: str, hashed_pass: str) -> bool:
-    return password_context.verify(password, hashed_pass)
+    def get_hashed_password(self, password: str) -> str:
+        return self.password_context.hash(password)
+
+
+    def verify_password(self, password: str, hashed_pass: str) -> bool:
+        return self.password_context.verify(password, hashed_pass)
+    
+
+user_auth = Authentication()
 
 
 def create_access_token(data: dict, expires_delta: int = None) -> str:
@@ -27,4 +36,4 @@ def create_access_token(data: dict, expires_delta: int = None) -> str:
     
     to_encode.update({"exp": expires_delta})
     encoded_jwt = jwt.encode(to_encode, settings.jwt_secret, settings.jwt_algorithm)
-    return encoded_jwt        
+    return encoded_jwt
