@@ -1,16 +1,11 @@
 import requests
-import random
 
 from app.schemas import jokes
-
-URL_CHUCK = "https://api.chucknorris.io/jokes/random"
-URL_DAD = "https://icanhazdadjoke.com"
-
-REQUEST_OPTIONS = ["chucknorris", "dadjoke"]
+from app.services import random_jokes
 
 
 def request_chuck(user_id: int) -> jokes.JokeCreate | None:
-    response = requests.get(URL_CHUCK)
+    response = requests.get(random_jokes.URL_CHUCK)
 
     if response.status_code != 200:
         return None
@@ -27,7 +22,7 @@ def request_chuck(user_id: int) -> jokes.JokeCreate | None:
 
 
 def request_dad(user_id: int) -> jokes.JokeCreate | None:
-    response = requests.get(URL_DAD, headers={"Accept": "application/json"})
+    response = requests.get(random_jokes.URL_DAD, headers=random_jokes.DAD_HEADERS)
 
     if response.status_code != 200:
         return None
@@ -43,13 +38,3 @@ def request_dad(user_id: int) -> jokes.JokeCreate | None:
         owner_id=user_id
     )
     return joke
-    
-
-def get_random_joke(user_id: int) -> jokes.JokeCreate | None:
-    selected_joke = random.choice(REQUEST_OPTIONS)
-    
-    if selected_joke == "chucknorris":
-        final_joke = request_chuck(user_id)
-    else:
-        final_joke = request_dad(user_id)
-    return final_joke

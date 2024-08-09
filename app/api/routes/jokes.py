@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from app.schemas import jokes
-from app.infra.requests.client import get_random_joke
+from app.services.random_jokes import get_random_joke
 from app.infra.postgres.crud import jokes_crud
 from app.infra.postgres.database import get_db
 from app.api.routes.auth import get_current_user_id
