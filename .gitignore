@@ -134,13 +134,13 @@ test/artesania/test.ipynb
 *.ipynb
 
 #vscode
-.vscode/
+.vscode/*
 
-# txt
-*.txt
+# # txt
+# *.txt
 
 #docker
-docker/Docker-compose.dev.yml
+# docker/Docker-compose.dev.yml
 
 #key
 key/

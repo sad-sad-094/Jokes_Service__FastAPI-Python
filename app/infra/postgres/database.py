@@ -2,6 +2,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
 from app.config import settings
+from app.logging import get_logging
+
+log = get_logging(__name__)
 
 base = declarative_base()
 
@@ -16,9 +19,9 @@ class Connection:
         base.metadata.create_all(self.engine)
 
     def close_sessions(self) -> None:
-        print("Closing database connection...")
+        log.info("Closing database connection...")
         self.session_local.close_all()
-        print("Succcessfully closed database connection.")
+        log.info("Succcessfully closed database connection.")
 
 
 db_connection: Connection = None
@@ -26,9 +29,9 @@ db_connection: Connection = None
 
 def init_connection() -> Connection:
     global db_connection
-    print("Connecting to database...")
+    log.info("Connecting to database...")
     db_connection = Connection()
-    print("Successfully connected to database.")
+    log.info("Successfully connected to database.")
     return db_connection
 
 

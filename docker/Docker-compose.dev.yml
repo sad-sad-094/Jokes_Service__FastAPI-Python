@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:
+  jokes-service:
+    image: jokes-service
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 8000
+    volumes:
+      - ../:/usr/src/app/
+    ports:
+      - 8080:8000
+      - 10001:10000
+    environment:
+      - DEBUGGER=False
+      - APP_NAME=Jokes Service
+      - SQLALCHEMY_DATABASE_URL=postgresql://postgres:sad@sad-jokes-db:5432/jokes-service
+      - SECRET_KEY=09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7
+      - ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=5
+    networks:
+      - sad-jokes
+
+  sad-jokes-db:
+    image: sad-jokes-db
+    build:
+      context: ../db
+      dockerfile: Dockerfile
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=sad
+    volumes:
+      - sad-jokes-db:/var/lib/postgresql/data
+    networks:
+      - sad-jokes
+
+volumes:
+  sad-jokes-db:
+    external: true
+
+networks:
+  sad-jokes:
+    external: true

@@ -11,7 +11,7 @@ class Settings(BaseSettings):
 
     app_name: str = Field(alias="APP_NAME")
 
-    model_config = SettingsConfigDict(env_file=".env")
+    # model_config = SettingsConfigDict(env_file=".env")
 
 
 settings = Settings()
